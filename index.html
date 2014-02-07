@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <title>Hello React</title>
+    <script src="http://fb.me/react-0.8.0.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.8.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/jsx">
+      /**
+       * @jsx React.DOM
+       */
+      // The above declaration must remain intact at the top of the script.
+      // Your code here
+      var commentsData = [
+        {author: "Pete Hunt", text: "This is one comment"},
+        {author: "Jordan Walke", text: "This is *another* comment"}
+      ];
+
+      var CommmentBox = React.createClass({
+        getInitialState: function() {
+          return {data: []};
+        },
+        componentWillMount: function() {
+          this.loadComments();
+        },
+        render: function() {
+          return (
+            <div className='commmentBox'>
+              <h1>Comments</h1>
+              <CommentList data={this.state.data} />
+              <br />
+              <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+            </div>
+          ); 
+        }, 
+        handleCommentSubmit: function(comment) {
+          commentsData.push(comment);
+          this.loadComments();
+        }, 
+        loadComments: function() {
+          console.log(commentsData.length);
+          this.setState({data: commentsData});
+        }
+      });
+     
+      var CommentList = React.createClass({
+        render: function() {
+          var commentNodes = this.props.data.map(function(comment) {
+            return <Comment author={comment.author} text={comment.text} />;
+          });
+          return (
+            <div className='commentList'>
+              {commentNodes}
+            </div>
+          );
+        }
+      });
+
+      var CommentForm = React.createClass({
+        render: function() {
+          return (
+            <form className='commentForm' onSubmit={this.handleSubmit}>
+              <input type='text' placeholder='Your name' ref='author'/>
+              <input type='text' placeholder='Your comment' ref='text'/>
+              <input type='submit' value='Post' />
+            </form>
+          );
+        },
+        handleSubmit: function() {
+          var author = this.refs.author.getDOMNode().value.trim();
+          var text = this.refs.text.getDOMNode().value.trim();
+          this.props.onCommentSubmit({author: author, text: text});
+          this.refs.author.getDOMNode().value = '';
+          this.refs.text.getDOMNode().value = '';
+          return false;
+        }
+      });
+
+      var Comment = React.createClass({
+        render: function() {
+          return(
+            <div className='comment'>
+            <br />
+              <h3 className='commentAuthor'>
+                {this.props.author} wrote:
+              </h3>
+              <h3 className='commentText'>
+                {this.props.text}
+              </h3>
+            </div>
+          );
+        }
+      });
+
+       React.renderComponent(
+        <CommmentBox />, 
+        document.getElementById('content')
+      );
+
+    </script>
+  </body>
+</html>
